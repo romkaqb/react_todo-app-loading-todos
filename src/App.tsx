@@ -21,6 +21,18 @@ export const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+
+    return;
+  }, [error]);
+
+  useEffect(() => {
     if (USER_ID) {
       setIsLoading(true);
       getTodos()
@@ -87,18 +99,6 @@ export const App: React.FC = () => {
         setError('Unable to update a todo');
       });
   };
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError(null);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-
-    return;
-  }, [error]);
 
   const handleError = () => {
     setError(null);
