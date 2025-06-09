@@ -13,7 +13,7 @@ import { Todo } from './types/Todo';
 import { Header } from './components/Header';
 import { TodoList } from './components/TodoList';
 import { Footer } from './components/Footer';
-import classNames from 'classnames';
+import { ShowError } from './components/Error';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -88,6 +88,22 @@ export const App: React.FC = () => {
       });
   };
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+
+    return;
+  }, [error]);
+
+  const handleError = () => {
+    setError(null);
+  };
+
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
@@ -103,24 +119,10 @@ export const App: React.FC = () => {
           updateTodoTitle={updateTodoTitle}
         />
 
-        <Footer />
+        {todos.length > 0 && <Footer />}
       </div>
 
-      <div
-        data-cy="ErrorNotification"
-        className={classNames(
-          'notification is-danger is-light has-text-weight-normal',
-          { hidden: !error },
-        )}
-      >
-        <button
-          data-cy="HideErrorButton"
-          type="button"
-          className="delete"
-          onClick={() => setError(null)}
-        />
-        {error}
-      </div>
+      {error && <ShowError error={error} handleError={handleError} />}
     </div>
   );
 };
