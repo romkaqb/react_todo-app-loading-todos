@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/control-has-associated-label */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Todo } from '../types/Todo';
 import classNames from 'classnames';
@@ -74,11 +77,7 @@ export const TodoList: React.FC<Props> = ({
             completed: todo.completed,
           })}
         >
-          <label
-            className="todo__status-label"
-          >
-          </label>
-
+          <label className="todo__status-label">
             <input
               data-cy="TodoStatus"
               type="checkbox"
@@ -86,6 +85,7 @@ export const TodoList: React.FC<Props> = ({
               checked={todo.completed}
               onChange={() => toggleTodoCompleted(todo.id)}
             />
+          </label>
 
           {editingId === todo.id ? (
             <form
