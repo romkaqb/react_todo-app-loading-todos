@@ -1,12 +1,15 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable jsx-a11y/control-has-associated-label */
-
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Todo } from '../types/Todo';
-import classNames from 'classnames';
+import { TodoItem } from './TodoIdem';
 
 type Props = {
-  todos: Todo[];
+  filteredTodos: Todo[];
   isLoading: boolean;
   toggleTodoCompleted: (id: number) => void;
   deleteTodo: (id: number) => void;
@@ -14,7 +17,7 @@ type Props = {
 };
 
 export const TodoList: React.FC<Props> = ({
-  todos,
+  filteredTodos,
   isLoading,
   toggleTodoCompleted,
   deleteTodo,
@@ -29,12 +32,15 @@ export const TodoList: React.FC<Props> = ({
     setEditInput(todo.title);
   };
 
+  const handleEditInput = (e: ChangeEvent<HTMLInputElement>) =>
+    setEditInput(e.target.value);
+
   const handleSave = useCallback(() => {
     if (editingId !== undefined) {
       const trimmed = editInput.trim();
 
       if (trimmed) {
-        updateTodoTitle(editingId, trimmed); // виклик оновлення через пропси
+        updateTodoTitle(editingId, trimmed);
       }
 
       setEditingId(undefined);
@@ -69,75 +75,20 @@ export const TodoList: React.FC<Props> = ({
 
   return (
     <section className="todoapp__main" data-cy="TodoList">
-      {todos.map(todo => (
-        <div
-          data-cy="Todo"
-          key={todo.id}
-          className={classNames('todo', {
-            completed: todo.completed,
-          })}
-        >
-          <label className="todo__status-label">
-            <input
-              data-cy="TodoStatus"
-              type="checkbox"
-              className="todo__status"
-              checked={todo.completed}
-              onChange={() => toggleTodoCompleted(todo.id)}
-            />
-          </label>
-
-          {editingId === todo.id ? (
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                handleSave();
-              }}
-            >
-              <input
-                ref={inputRef}
-                data-cy="TodoTitleField"
-                type="text"
-                className="todo__title-field"
-                placeholder="Empty todo will be deleted"
-                value={editInput}
-                onChange={e => setEditInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSave();
-                  }
-                }}
-              />
-            </form>
-          ) : (
-            <>
-              <span
-                data-cy="TodoTitle"
-                className="todo__title"
-                onDoubleClick={() => editor(todo)}
-              >
-                {todo.title}
-              </span>
-
-              <button
-                type="button"
-                className="todo__remove"
-                data-cy="TodoDelete"
-                onClick={() => deleteTodo(todo.id)}
-              >
-                ×
-              </button>
-            </>
-          )}
-
-          {isLoading && (
-            <div data-cy="TodoLoader" className="modal overlay is-active">
-              <div className="modal-background has-background-white-ter" />
-              <div className="loader" />
-            </div>
-          )}
-        </div>
+      {filteredTodos.map(todo => (
+        <TodoItem
+        key={todo.id}
+          todo={todo}
+          isLoading={isLoading}
+          toggleTodoCompleted={toggleTodoCompleted}
+          deleteTodo={deleteTodo}
+          handleSave={handleSave}
+          handleEditInput={handleEditInput}
+          editor={editor}
+          editInput={editInput}
+          editingId={editingId}
+          inputRef={inputRef}
+        />
       ))}
     </section>
   );

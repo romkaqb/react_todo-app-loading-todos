@@ -13,12 +13,34 @@ import { Todo } from './types/Todo';
 import { Header } from './components/Header';
 import { TodoList } from './components/TodoList';
 import { Footer } from './components/Footer';
-import { ShowError } from './components/Error';
+import { ShowError } from './components/ShowError';
+import { Status } from './types/Status';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Status>(Status.All);
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === Status.All) {
+      return true;
+    }
+
+    if (filter === Status.Active) {
+      return !todo.completed;
+    }
+
+    if (filter === Status.Completed) {
+      return todo.completed;
+    }
+
+    return true;
+  });
+
+  const clearCompleted = () => {
+    setTodos(todos.filter(todo => !todo.completed));
+  };
 
   useEffect(() => {
     if (error) {
@@ -112,17 +134,24 @@ export const App: React.FC = () => {
         <Header onSubmit={addTodo} todos={todos} />
 
         <TodoList
-          todos={todos}
+          filteredTodos={filteredTodos}
           isLoading={isLoading}
           toggleTodoCompleted={toggleTodoCompleted}
           deleteTodo={deleteTodoById}
           updateTodoTitle={updateTodoTitle}
         />
 
-        {todos.length > 0 && <Footer />}
+        {todos.length > 0 && (
+          <Footer
+            todos={todos}
+            clearCompleted={clearCompleted}
+            filter={filter}
+            setFilter={setFilter}
+          />
+        )}
       </div>
 
-      {error && <ShowError error={error} handleError={handleError} />}
+      <ShowError error={error} handleError={handleError} />
     </div>
   );
 };
